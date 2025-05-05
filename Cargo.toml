@@ -5,10 +5,11 @@ edition = "2021"
 
 [dependencies]
 reqwest = { version="0.12.12", features=["blocking", "json", "stream"] }
-clap = "4.5.29"
+clap = {version="4.5.29", features=["derive"]}
 chrono = "0.4.39"
 tokio = { version="1.43.0", features=["full"] }
 serde = { version="1.0.217", features=["derive"] }
 dirs = "6.0.0"
 indicatif = "0.17.11"
 futures-util = "0.3.31"
+serde_json = "1.0.140"
