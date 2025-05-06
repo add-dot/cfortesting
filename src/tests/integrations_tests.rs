@@ -1,4 +1,3 @@
-use crate::extraction::search_values_for_lts_know;
 static DATA_TEST: &str = r#"
     {
     "timestamp": "2025-02-24T11:09:12.900Z",
@@ -299,6 +298,7 @@ static DATA_TEST: &str = r#"
     }"#;
 #[test]
 fn it_extract_lts_know_version_linux() {
+    use crate::extraction::search_values_for_lts_know;
     let (version, downloable) =
         search_values_for_lts_know(DATA_TEST, "linux64", "Stable", "chrome").unwrap();
     assert_eq!("https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chrome-linux64.zip".to_string(), downloable);
@@ -306,17 +306,17 @@ fn it_extract_lts_know_version_linux() {
 }
 #[test]
 fn it_extract_lts_know_version_windows() {
+    use crate::extraction::search_values_for_lts_know;
     let (version, downloable) =
         search_values_for_lts_know(DATA_TEST, "win64", "Stable", "chrome").unwrap();
     assert_eq!("https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/win64/chrome-win64.zip".to_string(), downloable);
     assert_eq!("133.0.6943.126", version);
 }
 
-use crate::parse_install::parse_entry;
-use crate::parse_install::Error;
 
 #[test]
 fn test_input_installation() {
+    use crate::parse_install::parse_entry;
     let input_chrome = "chrome@1.1.1";
     let input_chromedriver = "chromedriver@1.1.1";
     let input_chrome_headless_shell = "chrome_headless_shell@1.1.1";
@@ -336,6 +336,8 @@ fn test_input_installation() {
 
 #[test]
 fn test_input_installation_bad_without_version() {
+    use crate::parse_install::parse_entry;
+    use crate::parse_install::Error;
     let input_chrome = "chrome@";
     let input_chromedriver = "chromedriver@";
     let input_chrome_headless_shell = "chrome_headless_shell@";
@@ -352,6 +354,7 @@ fn test_input_installation_bad_without_version() {
 
 #[test]
 fn test_input_installation_stable() {
+    use crate::parse_install::parse_entry;
     let input_chrome = "chrome";
     let input_chromedriver = "chromedriver";
     let input_chrome_headless_shell = "chrome_headless_shell";
@@ -371,6 +374,8 @@ fn test_input_installation_stable() {
 
 #[test]
 fn test_input_installation_empty() {
+    use crate::parse_install::parse_entry;
+    use crate::parse_install::Error;
     let input_chrome = "";
     let result_input_chrome = parse_entry(input_chrome);
     assert_eq!(Err(Error::EmptyValue), result_input_chrome);
@@ -378,6 +383,8 @@ fn test_input_installation_empty() {
 
 #[test]
 fn test_input_invalid_name() {
+    use crate::parse_install::parse_entry;
+    use crate::parse_install::Error;
     let input_chrome = "testing@1.1.1";
     let result_input_chrome = parse_entry(input_chrome);
     assert_eq!(Err(Error::InvalidName), result_input_chrome);
