@@ -2,7 +2,6 @@
 pub enum Error {
     InvalidEntryFormat,
     InvalidName,
-    InvalidVersionFormat,
     EmptyValue,
 }
 
