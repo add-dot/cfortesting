@@ -2,7 +2,7 @@ use dirs::home_dir;
 use std::fs;
 use std::path::absolute;
 
-const ENVIRO_DIR: &str = "/.cft/";
+pub const ENVIRO_DIR: &str = "/.cft/";
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Error {

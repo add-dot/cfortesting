@@ -47,14 +47,16 @@ async fn main() {
                     .unwrap();
                 }
             }
-            let _ = downloadable::download_browser(
+            let target_file_os = downloadable::download_browser(
                 url,
                 version_string,
                 type_downloable,
-                parsed_absolute,
+                parsed_absolute.clone(),
             )
             .await
-            .ok();
+            .ok()
+            .unwrap();
+            let _ = downloadable::decompress(target_file_os, parsed_absolute).unwrap();
         }
     }
 }
