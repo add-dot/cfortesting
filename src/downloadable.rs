@@ -24,7 +24,7 @@ pub async fn download_browser(
     let pb = ProgressBar::new(content_length);
     pb.set_style(
         ProgressStyle::with_template(
-            "[{elapsed_precise}] {bar:40.cyan/blue} {bytes}/{total_bytes} ({eta}) {msg_progress}",
+            "[{elapsed_precise}] {bar:40.cyan/blue} {bytes}/{total_bytes} ({eta}) {msg}",
         )
         .unwrap()
         .progress_chars("#>-"),
