@@ -14,7 +14,10 @@ async fn main() {
         "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json";
     const URL_LTS_GK: &str = "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json";
     let platform = unixs::utils::get_platform();
-    let parsed_absolute = unixs::utils::create_dir().unwrap();
+    let parsed_absolute = unixs::utils::create_dir().unwrap_or_else(|err| {
+        eprintln!("Error when initilizing enviroment {err:?}");
+        std::process::exit(1);
+    });
     let cli = commands::Cli::parse();
     match cli.command {
         commands::Commands::ListChannels => {
