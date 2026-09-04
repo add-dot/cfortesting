@@ -1,4 +1,3 @@
-use crate::unixs::utils::{self, ENVIRO_DIR};
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::Client;
