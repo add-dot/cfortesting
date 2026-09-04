@@ -25,7 +25,10 @@ async fn main() {
             println!("{listed_channels:?}");
         }
         commands::Commands::Install { value } => {
-            let (type_downloable, version) = parse_entry(&value).unwrap();
+            let (type_downloable, version) = parse_entry(&value).unwrap_or_else(|err| {
+                eprintln!("Error parsing entry value: {err:?}");
+                std::process::exit(1);
+            });
             let mut version_string: String = String::default();
             let mut url: String = String::default();
             match version {
