@@ -32,18 +32,20 @@ pub async fn download_browser(
         .progress_chars("#>-"),
     );
     if response.status().is_success() {
-        let mut f = File::create(&file_path_name)?;
+        let f = File::create(&file_path_name)?;
+        let mut writer = std::io::BufWriter::new(f);
         // Create file
         let mut stream = response.bytes_stream();
         while let Some(chunk) = stream.next().await {
-            let chunk = chunk.unwrap();
-            f.write_all(&chunk).unwrap();
+            let chunk = chunk?;
+            writer.write_all(&chunk)?;
             pb.inc(chunk.len() as u64);
         }
+        writer.flush()?;
         pb.finish_with_message(msg_progress);
         Ok(file_path_name)
     } else {
-        panic!("Failed to download file. Status: {}", response.status());
+        Err(format!("Failed to download file. Status: {}", response.status()).into())
     }
 }
 
