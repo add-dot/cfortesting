@@ -55,7 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 type_downloable,
             )
             .await?;
-            let _ = downloadable::decompress(target_file_os, parsed_absolute).unwrap();
+            downloadable::decompress(&target_file_os, &parsed_absolute).unwrap();
         }
     }
     Ok(())

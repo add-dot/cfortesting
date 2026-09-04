@@ -48,16 +48,16 @@ pub async fn download_browser(
 }
 
 pub fn decompress(
-    target_file_os: String,
-    parsed_absolute: String,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let file = fs::File::open(&target_file_os).unwrap();
+    target_file_os: &str,
+    parsed_absolute: &str,
+) -> Result<() , Box<dyn std::error::Error>> {
+    let file = fs::File::open(target_file_os)?;
 
     println!("{parsed_absolute:?}");
-    let mut archive = zip::ZipArchive::new(file).unwrap();
+    let mut archive = zip::ZipArchive::new(file)?;
 
     for i in 0..archive.len() {
-        let mut file = archive.by_index(i).unwrap();
+        let mut file = archive.by_index(i)?;
         let Some(outpath) = file.enclosed_name() else { continue };
         let final_outpath = Path::new(&parsed_absolute).join(outpath);
         {
@@ -69,7 +69,7 @@ pub fn decompress(
 
         if file.is_dir() {
             println!("File {} extracted to \"{}\"", i, final_outpath.display());
-            fs::create_dir_all(&final_outpath).unwrap();
+            fs::create_dir_all(&final_outpath)?;
         } else {
             println!(
                 "File {} extracted to \"{}\" ({} bytes)",
@@ -79,11 +79,11 @@ pub fn decompress(
             );
             if let Some(p) = final_outpath.parent() {
                 if !p.exists() {
-                    fs::create_dir_all(p).unwrap();
+                    fs::create_dir_all(p)?;
                 }
             }
-            let mut outfile = fs::File::create(&final_outpath).unwrap();
-            io::copy(&mut file, &mut outfile).unwrap();
+            let mut outfile = fs::File::create(&final_outpath)?;
+            io::copy(&mut file, &mut outfile)?;
         }
 
         // Get and Set permissions
@@ -92,10 +92,10 @@ pub fn decompress(
             use std::os::unix::fs::PermissionsExt;
 
             if let Some(mode) = file.unix_mode() {
-                fs::set_permissions(&final_outpath, fs::Permissions::from_mode(mode)).unwrap();
+                fs::set_permissions(&final_outpath, fs::Permissions::from_mode(mode))?;
             }
         }
     }
-    let _ = fs::remove_file(&target_file_os);
-    Ok(String::default())
+    let _ = fs::remove_file(target_file_os);
+    Ok(())
 }
