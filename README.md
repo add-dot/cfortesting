@@ -1,3 +1,4 @@
+[![pipeline status](https://gitlab.com/var0g/cft/master/pipeline.svg)](https://gitlab.com/var0g/cft/-/commits/master
 ## cftesting
 A command-line interface tool written in Rust to easily download Chrome for testing,
 Chromedriver, Chrome Headless Shell binaries.
@@ -42,4 +43,5 @@ Example path on Linux/macOS:
 ```
 
 #### License
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 This project is licensed under the MIT License. See the [LICENSE](https://gitlab.com/var0G/cft/-/blob/master/LICENSE) file for details.

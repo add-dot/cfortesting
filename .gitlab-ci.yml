@@ -3,9 +3,18 @@ image: rust:1.94.1-alpine3.23
 stages:
   - test
   - validate
+
 .setup_deps: &setup_deps
   - apk add --no-cache pkgconfig openssl-dev musl-dev gcc make perl
+cache: &global_cache
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .cargo/
+    - target/
+  policy: pull-push
 
+variables:
+  CARGO_HOME: ${CI_PROJECT_DIR}/.cargo
 
 validate-syntax-errors:
   stage: test
@@ -13,12 +22,16 @@ validate-syntax-errors:
     - *setup_deps
   script:
     - cargo check --workspace --all-features
+
 validate_tests:
-  stage: test
+  stage: validate
   before_script:
     - *setup_deps
   script:
     - cargo test --workspace --all-features
+  cache:
+    <<: *global_cache
+    policy: pull
 
 validate-format-check-and-lint:
   stage: validate
@@ -28,3 +41,6 @@ validate-format-check-and-lint:
   script:
     - cargo clippy --workspace --all-features --all-targets -- -D warnings
     - cargo fmt --all -- --check
+  cache:
+    <<: *global_cache
+    policy: pull
