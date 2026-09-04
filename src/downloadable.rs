@@ -4,7 +4,7 @@ use reqwest::Client;
 use std::fs;
 use std::fs::File;
 use std::io::{self, Write};
-use std::path::{Path};
+use std::path::{Path, PathBuf};
 use std::env::temp_dir;
 
 pub async fn download_browser(
@@ -59,7 +59,13 @@ pub fn decompress(
     for i in 0..archive.len() {
         let mut file = archive.by_index(i)?;
         let Some(outpath) = file.enclosed_name() else { continue };
-        let final_outpath = Path::new(&parsed_absolute).join(outpath);
+        let mut components = outpath.components();
+        components.next();
+        let stripped_path: PathBuf = components.collect();
+        if stripped_path.as_os_str().is_empty() {
+            continue;
+        }
+        let final_outpath = Path::new(&parsed_absolute).join(stripped_path);
         {
             let comment = file.comment();
             if !comment.is_empty() {

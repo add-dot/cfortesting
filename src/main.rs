@@ -49,13 +49,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     )?
                 }
             };
+
+            let extraction_path_str = unixs::utils::tree_directory(&parsed_absolute, type_downloable, &version_string);
             let target_file_os = downloadable::download_browser(
                 url,
                 version_string,
                 type_downloable,
             )
             .await?;
-            downloadable::decompress(&target_file_os, &parsed_absolute).unwrap();
+            downloadable::decompress(&target_file_os, &extraction_path_str)?;
         }
     }
     Ok(())
