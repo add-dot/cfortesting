@@ -319,10 +319,10 @@ fn test_input_installation() {
     use crate::parse_install::parse_entry;
     let input_chrome = "chrome@1.1.1";
     let input_chromedriver = "chromedriver@1.1.1";
-    let input_chrome_headless_shell = "chrome_headless_shell@1.1.1";
+    let input_chrome_headless_shell = "chrome-headless-shell@1.1.1";
     let result_input_chrome = ("chrome", "1.1.1");
     let result_input_chromedriver = ("chromedriver", "1.1.1");
-    let result_input_chrome_headless_shell = ("chrome_headless_shell", "1.1.1");
+    let result_input_chrome_headless_shell = ("chrome-headless-shell", "1.1.1");
     assert_eq!(result_input_chrome, parse_entry(input_chrome).unwrap());
     assert_eq!(
         result_input_chromedriver,
@@ -340,7 +340,7 @@ fn test_input_installation_bad_without_version() {
     use crate::parse_install::Error;
     let input_chrome = "chrome@";
     let input_chromedriver = "chromedriver@";
-    let input_chrome_headless_shell = "chrome_headless_shell@";
+    let input_chrome_headless_shell = "chrome-headless-shell@";
     let result_input_chrome = parse_entry(input_chrome);
     let result_input_chromedriver = parse_entry(input_chromedriver);
     let result_input_chrome_headless_shell = parse_entry(input_chrome_headless_shell);
@@ -357,7 +357,7 @@ fn test_input_installation_stable() {
     use crate::parse_install::parse_entry;
     let input_chrome = "chrome";
     let input_chromedriver = "chromedriver";
-    let input_chrome_headless_shell = "chrome_headless_shell";
+    let input_chrome_headless_shell = "chrome-headless-shell";
     let result_input_chrome = parse_entry(input_chrome);
     let result_input_chromedriver = parse_entry(input_chromedriver);
     let result_input_chrome_headless_shell = parse_entry(input_chrome_headless_shell);
@@ -367,7 +367,7 @@ fn test_input_installation_stable() {
         result_input_chromedriver.unwrap()
     );
     assert_eq!(
-        ("chrome_headless_shell", "Stable"),
+        ("chrome-headless-shell", "Stable"),
         result_input_chrome_headless_shell.unwrap()
     );
 }

@@ -43,9 +43,11 @@ struct GoodKnowVersions {
 }
 
 #[allow(dead_code)]
+#[derive(Deserialize)]
 struct Downloads {
     chrome: Vec<Download>,
     chromedriver: Vec<Download>,
+    #[serde(rename = "chrome-headless-shell")]
     chrome_headless_shell: Vec<Download>,
 }
 
