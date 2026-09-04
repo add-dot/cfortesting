@@ -26,7 +26,7 @@ struct Download {
 // 115.0.5763.0  only have chrome on the download vector
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
-struct Downloads {
+struct DownloadsOld {
     chrome: Vec<Download>,
 }
 
@@ -38,15 +38,16 @@ struct ApiResponseVersions {
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct GoodKnowVersions {
-    version: String,
-    revision: String,
+    version: String, revision: String,
     downloads: HashMap<String, Vec<Download>>,
 }
 
 #[allow(dead_code)]
-struct DownloadsOld {
+#[derive(Deserialize)]
+struct Downloads {
     chrome: Vec<Download>,
     chromedriver: Vec<Download>,
+    #[serde(rename = "chrome-headless-shell")]
     chrome_headless_shell: Vec<Download>,
 }
 

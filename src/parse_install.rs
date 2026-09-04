@@ -2,7 +2,6 @@
 pub enum Error {
     InvalidEntryFormat,
     InvalidName,
-    InvalidVersionFormat,
     EmptyValue,
 }
 
@@ -31,7 +30,7 @@ pub fn parse_entry(entry: &str) -> Result<(&str, &str), Error> {
             return Err(Error::InvalidEntryFormat);
         }
         match name {
-            "chrome" | "chromedriver" | "chrome_headless_shell" => {
+            "chrome" | "chromedriver" | "chrome-headless-shell" => {
                 match version.to_lowercase().as_str() {
                     "stable" => Ok((name, "Stable")),
                     "beta" => Ok((name, "Beta")),
@@ -45,7 +44,7 @@ pub fn parse_entry(entry: &str) -> Result<(&str, &str), Error> {
     } else {
         let name = trimmed_entry;
         match name {
-            "chrome" | "chromedriver" | "chrome_headless_shell" => Ok((name, "Stable")),
+            "chrome" | "chromedriver" | "chrome-headless-shell" => Ok((name, "Stable")),
             _ => Err(Error::InvalidName),
         }
     }
