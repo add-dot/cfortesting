@@ -9,7 +9,7 @@ mod tests;
 mod unixs;
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     const URL_GV: &str =
         "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json";
     const URL_LTS_GK: &str = "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json";
@@ -29,40 +29,37 @@ async fn main() {
                 eprintln!("Error parsing entry value: {err:?}");
                 std::process::exit(1);
             });
-            let mut version_string: String = String::default();
-            let mut url: String = String::default();
-            match version {
+            let (version_string, url) = match version {
                 "Stable" | "Beta" | "Dev" | "Canary" => {
-                    let response = extraction::fetch_cft(URL_LTS_GK).await.unwrap();
-                    (version_string, url) = extraction::search_values_for_lts_know(
+                    let response = extraction::fetch_cft(URL_LTS_GK).await?;
+                    extraction::search_values_for_lts_know(
                         &response,
                         platform,
                         version,
                         type_downloable,
                     )
-                    .unwrap();
+                    .unwrap()
                 }
                 _ => {
-                    let response = extraction::fetch_cft(URL_GV).await.unwrap();
-                    (version_string, url) = extraction::search_values_for_specifc_version(
+                    let response = extraction::fetch_cft(URL_GV).await?;
+                    extraction::search_values_for_specifc_version(
                         &response,
                         platform,
                         version,
                         type_downloable,
                     )
-                    .unwrap();
+                    .unwrap()
                 }
-            }
+            };
             let target_file_os = downloadable::download_browser(
                 url,
                 version_string,
                 type_downloable,
                 parsed_absolute.clone(),
             )
-            .await
-            .ok()
-            .unwrap();
+            .await?;
             let _ = downloadable::decompress(target_file_os, parsed_absolute).unwrap();
         }
     }
+    Ok(())
 }
