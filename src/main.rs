@@ -5,8 +5,8 @@ mod commands;
 mod downloadable;
 mod extraction;
 mod parse_install;
-mod tests;
 mod sys;
+mod tests;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -50,13 +50,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            let extraction_path_str = sys::utils::tree_directory(&parsed_absolute, type_downloable, &version_string);
-            let target_file_os = downloadable::download_browser(
-                url,
-                version_string,
-                type_downloable,
-            )
-            .await?;
+            let extraction_path_str =
+                sys::utils::tree_directory(&parsed_absolute, type_downloable, &version_string);
+            let target_file_os =
+                downloadable::download_browser(url, version_string, type_downloable).await?;
             downloadable::decompress(&target_file_os, &extraction_path_str)?;
         }
     }
