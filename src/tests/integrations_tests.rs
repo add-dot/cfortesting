@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 static DATA_TEST: &str = r#"
     {
     "timestamp": "2025-02-24T11:09:12.900Z",

@@ -37,8 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         platform,
                         version,
                         type_downloable,
-                    )
-                    .unwrap()
+                    )?
                 }
                 _ => {
                     let response = extraction::fetch_cft(URL_GV).await?;
@@ -47,8 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         platform,
                         version,
                         type_downloable,
-                    )
-                    .unwrap()
+                    )?
                 }
             };
             let target_file_os = downloadable::download_browser(

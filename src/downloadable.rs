@@ -28,7 +28,6 @@ pub async fn download_browser(
         .unwrap()
         .progress_chars("#>-"),
     );
-    // TODO: need to insert inside the template in order to work
     if response.status().is_success() {
         let mut f = File::create(&file_path_name)?;
         // Create file
@@ -45,7 +44,6 @@ pub async fn download_browser(
     }
 }
 
-//TODO: Need to change path, in order to decompres on ~/.cft/ path on linux
 pub fn decompress(
     target_file_os: String,
     parsed_absolute: String,
@@ -57,10 +55,7 @@ pub fn decompress(
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).unwrap();
-        let outpath = match file.enclosed_name() {
-            Some(path) => path,
-            None => continue,
-        };
+        let Some(outpath) = file.enclosed_name() else { continue };
         let final_outpath: PathBuf = [
             parsed_absolute.to_string(),
             outpath.to_str().unwrap().to_owned(),
