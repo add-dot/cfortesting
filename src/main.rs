@@ -53,7 +53,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 url,
                 version_string,
                 type_downloable,
-                parsed_absolute.clone(),
             )
             .await?;
             let _ = downloadable::decompress(target_file_os, parsed_absolute).unwrap();

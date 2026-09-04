@@ -4,20 +4,23 @@ use reqwest::Client;
 use std::fs;
 use std::fs::File;
 use std::io::{self, Write};
-use std::path::PathBuf;
+use std::path::{Path};
+use std::env::temp_dir;
 
 pub async fn download_browser(
     target_browser: String,
     target_version: String,
     type_to_download: &str,
-    target_file_os: String,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let client = Client::new();
     let response = client.get(target_browser).send().await.unwrap();
 
     let content_length = response.content_length().unwrap_or(0);
-    let file_path_name = target_file_os.clone() + type_to_download + "-" + &target_version + ".zip";
-    let msg_progress = "Download Finish!\n the file is located ".to_owned() + &file_path_name;
+    let mut file_path = temp_dir();
+    let file_name = format!("{type_to_download}-{target_version}.zip");
+    file_path.push(file_name);
+    let file_path_name = file_path.to_str().unwrap().to_string();
+    let msg_progress = format!("Download Finish!\n the file is located {file_path_name}");
 
     // Barra de progreso
     let pb = ProgressBar::new(content_length);
@@ -48,7 +51,7 @@ pub fn decompress(
     target_file_os: String,
     parsed_absolute: String,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    let file = fs::File::open(target_file_os).unwrap();
+    let file = fs::File::open(&target_file_os).unwrap();
 
     println!("{parsed_absolute:?}");
     let mut archive = zip::ZipArchive::new(file).unwrap();
@@ -56,12 +59,7 @@ pub fn decompress(
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).unwrap();
         let Some(outpath) = file.enclosed_name() else { continue };
-        let final_outpath: PathBuf = [
-            parsed_absolute.to_string(),
-            outpath.to_str().unwrap().to_owned(),
-        ]
-        .into_iter()
-        .collect();
+        let final_outpath = Path::new(&parsed_absolute).join(outpath);
         {
             let comment = file.comment();
             if !comment.is_empty() {
@@ -98,5 +96,6 @@ pub fn decompress(
             }
         }
     }
+    let _ = fs::remove_file(&target_file_os);
     Ok(String::default())
 }
