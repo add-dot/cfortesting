@@ -11,28 +11,26 @@ pub async fn download_browser(
     target_browser: String,
     target_version: String,
     type_to_download: &str,
-) -> Result<String, Box<dyn std::error::Error>> {
+) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let client = Client::new();
-    let response = client.get(target_browser).send().await.unwrap();
+    let response = client.get(target_browser).send().await?;
 
     let content_length = response.content_length().unwrap_or(0);
     let mut file_path = temp_dir();
     let file_name = format!("{type_to_download}-{target_version}.zip");
     file_path.push(file_name);
-    let file_path_name = file_path.to_str().unwrap().to_string();
-    let msg_progress = format!("\nSuccess, now decompressing files...");
 
-    // Barra de progreso
+    let msg_progress = "\nSuccess, now decompressing files...".to_string();
     let pb = ProgressBar::new(content_length);
     pb.set_style(
         ProgressStyle::with_template(
             "[{elapsed_precise}] {bar:40.cyan/blue} {bytes}/{total_bytes} ({eta}) {msg}",
-        )
-        .unwrap()
+        )?
         .progress_chars("#>-"),
     );
+
     if response.status().is_success() {
-        let f = File::create(&file_path_name)?;
+        let f = File::create(&file_path)?;
         let mut writer = std::io::BufWriter::new(f);
         // Create file
         let mut stream = response.bytes_stream();
@@ -43,14 +41,14 @@ pub async fn download_browser(
         }
         writer.flush()?;
         pb.finish_with_message(msg_progress);
-        Ok(file_path_name)
+        Ok(file_path)
     } else {
         Err(format!("Failed to download file. Status: {}", response.status()).into())
     }
 }
 // Implemtation with lifetime of file clean up on this option we use this  Drop Guard to drop the
 // file after the decompress is made.
-struct FileCleanup<'a>(&'a str);
+struct FileCleanup<'a>(&'a Path);
 impl Drop for FileCleanup<'_> {
     fn drop(&mut self) {
         let _ = std::fs::remove_file(self.0);
@@ -58,8 +56,8 @@ impl Drop for FileCleanup<'_> {
 }
 
 pub fn decompress(
-    target_file_os: &str,
-    parsed_absolute: &str,
+    target_file_os: &Path,
+    parsed_absolute: &str
 ) -> Result<(), Box<dyn std::error::Error>> {
     let _cleanup = FileCleanup(target_file_os);
     let file = fs::File::open(target_file_os)?;
