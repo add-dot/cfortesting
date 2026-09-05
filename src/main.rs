@@ -50,7 +50,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 _ => {
                     let response = extraction::fetch_cft(URL_GV).await?;
-                    extraction::search_values_for_specifc_version(
+                    extraction::search_values_for_specific_version(
                         &response,
                         platform,
                         version,

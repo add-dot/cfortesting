@@ -58,7 +58,7 @@ pub async fn fetch_cft(url: &str) -> Result<String, Box<dyn Error>> {
     Ok(response.text().await?)
 }
 
-pub fn search_values_for_specifc_version(
+pub fn search_values_for_specific_version(
     response: &str,
     platform: &str,
     browser_version: &str,
@@ -73,15 +73,17 @@ pub fn search_values_for_specifc_version(
         .ok_or_else(|| {
             format!("Error: Version {browser_version} not found in the know good versions")
         })?;
-    if let Some(platforms) = chrome_version_to_download.downloads.get(type_of_chrome){
+    if let Some(platforms) = chrome_version_to_download.downloads.get(type_of_chrome) {
         downloable_version = platforms.iter().find(|x| x.platform == platform);
     }
-    match downloable_version {
-        Some(download) => Ok((
+    if let Some(download) = downloable_version {
+        Ok((
             chrome_version_to_download.version.clone(),
             download.url.clone(),
-        )),
-        None => panic!("Error, specifc version not found in the good versions"),
+        ))
+    } else {
+        let err_msg = format!("Error: Download not found for platform {platform} and type {type_of_chrome} in version {browser_version}");
+        Err(err_msg.into())
     }
 }
 
@@ -102,9 +104,11 @@ pub fn search_values_for_lts_know(
             download_version = platforms.iter().find(|x| x.platform == platform);
         }
     }
-    match download_version {
-        Some(download) => Ok((channels_version, download.url.clone())),
-        None => panic!("Error the version provides LTS is not good know version"),
+    if let Some(download) = download_version {
+        Ok((channels_version, download.url.clone()))
+    } else {
+        let err_msg = format!("Error: Download not found for platform {platform} and type {type_of_chrome} in channel {browser_version}");
+        Err(err_msg.into())
     }
 }
 
