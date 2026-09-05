@@ -53,9 +53,8 @@ pub async fn fetch_cft(url: &str) -> Result<String, Box<dyn Error>> {
     );
     let client = reqwest::Client::builder()
         .default_headers(headers)
-        .build()
-        .unwrap();
-    let response = client.get(url).send().await.unwrap();
+        .build()?;
+    let response = client.get(url).send().await?;
     Ok(response.text().await?)
 }
 
@@ -68,17 +67,18 @@ pub fn search_values_for_specifc_version(
     let response: ApiResponseVersions = serde_json::from_str(response)?;
     let mut downloable_version: Option<&Download> = None;
     let all_versions: Vec<GoodKnowVersions> = response.versions;
-    let chrome_version_to_download = all_versions.iter().find(|x| x.version == browser_version);
-    if let Some(platforms) = chrome_version_to_download
-        .unwrap()
-        .downloads
-        .get(type_of_chrome)
-    {
+    let chrome_version_to_download = all_versions
+        .iter()
+        .find(|x| x.version == browser_version)
+        .ok_or_else(|| {
+            format!("Error: Version {browser_version} not found in the know good versions")
+        })?;
+    if let Some(platforms) = chrome_version_to_download.downloads.get(type_of_chrome){
         downloable_version = platforms.iter().find(|x| x.platform == platform);
     }
     match downloable_version {
         Some(download) => Ok((
-            chrome_version_to_download.unwrap().version.clone(),
+            chrome_version_to_download.version.clone(),
             download.url.clone(),
         )),
         None => panic!("Error, specifc version not found in the good versions"),
