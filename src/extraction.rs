@@ -24,6 +24,7 @@ struct Download {
 
 // This is need for the struct to work on versions <= 115.0.5763.0 the CfT all versions >=
 // 115.0.5763.0  only have chrome on the download vector
+// NOTE: We will keep this structure to work on the future on old json with chrome versions.
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct DownloadsOld {

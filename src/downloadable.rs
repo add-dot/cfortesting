@@ -57,7 +57,7 @@ impl Drop for FileCleanup<'_> {
 
 pub fn decompress(
     target_file_os: &Path,
-    parsed_absolute: &str
+    parsed_absolute: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let _cleanup = FileCleanup(target_file_os);
     let file = fs::File::open(target_file_os)?;
