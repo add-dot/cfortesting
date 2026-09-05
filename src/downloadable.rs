@@ -55,48 +55,56 @@ impl Drop for FileCleanup<'_> {
     }
 }
 
-pub fn decompress(
+pub async fn decompress(
     target_file_os: &Path,
     parsed_absolute: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let _cleanup = FileCleanup(target_file_os);
-    let file = fs::File::open(target_file_os)?;
-    let mut archive = zip::ZipArchive::new(file)?;
+    let target_file_os = target_file_os.to_path_buf();
+    let parsed_absolute = parsed_absolute.to_string();
+    let result = tokio::task::spawn_blocking(
+        move || -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+            let _cleanup = FileCleanup(&target_file_os);
+            let file = fs::File::open(&target_file_os)?;
+            let mut archive = zip::ZipArchive::new(file)?;
 
-    for i in 0..archive.len() {
-        let mut file = archive.by_index(i)?;
-        let Some(outpath) = file.enclosed_name() else {
-            continue;
-        };
-        let mut components = outpath.components();
-        components.next();
-        let stripped_path: PathBuf = components.collect();
-        if stripped_path.as_os_str().is_empty() {
-            continue;
-        }
-        let final_outpath = Path::new(&parsed_absolute).join(stripped_path);
-        if file.is_dir() {
-            fs::create_dir_all(&final_outpath)?;
-        } else {
-            if let Some(p) = final_outpath.parent() {
-                if !p.exists() {
-                    fs::create_dir_all(p)?;
+            for i in 0..archive.len() {
+                let mut file = archive.by_index(i)?;
+                let Some(outpath) = file.enclosed_name() else {
+                    continue;
+                };
+                let mut components = outpath.components();
+                components.next();
+                let stripped_path: PathBuf = components.collect();
+                if stripped_path.as_os_str().is_empty() {
+                    continue;
+                }
+                let final_outpath = Path::new(&parsed_absolute).join(stripped_path);
+                if file.is_dir() {
+                    fs::create_dir_all(&final_outpath)?;
+                } else {
+                    if let Some(p) = final_outpath.parent() {
+                        if !p.exists() {
+                            fs::create_dir_all(p)?;
+                        }
+                    }
+                    let mut outfile = fs::File::create(&final_outpath)?;
+                    io::copy(&mut file, &mut outfile)?;
+                }
+
+                // Get and Set permissions
+                #[cfg(unix)]
+                {
+                    use std::os::unix::fs::PermissionsExt;
+
+                    if let Some(mode) = file.unix_mode() {
+                        fs::set_permissions(&final_outpath, fs::Permissions::from_mode(mode))?;
+                    }
                 }
             }
-            let mut outfile = fs::File::create(&final_outpath)?;
-            io::copy(&mut file, &mut outfile)?;
-        }
-
-        // Get and Set permissions
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-
-            if let Some(mode) = file.unix_mode() {
-                fs::set_permissions(&final_outpath, fs::Permissions::from_mode(mode))?;
-            }
-        }
-    }
-    println!("Completed successfully to: {parsed_absolute}");
-    Ok(())
+            println!("Completed successfully to: {parsed_absolute}");
+            Ok(())
+        },
+    )
+    .await?;
+    result.map_err(|err| err as Box<dyn std::error::Error>)
 }
