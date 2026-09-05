@@ -117,16 +117,21 @@ pub fn search_values_for_lts_know(
     }
 }
 
-pub fn list_channels() -> Vec<String> {
-    let channels: HashMap<&str, &str> = HashMap::from([
-        ("stable", "Stable"),
-        ("beta", "Beta"),
-        ("dev", "Dev"),
-        ("canary", "Canary"),
-    ]);
-    let mut vec_channels: Vec<String> = vec![];
-    for value in channels.values() {
-        vec_channels.push((*value).to_string());
+pub async fn list_channels(url: &str) -> Result<Vec<String>, Box<dyn Error>> {
+    let response_text = fetch_cft(url).await?;
+    let response: ApiResponseLtsKnow = serde_json::from_str(&response_text)?;
+    let channel_names = ["Stable", "Beta", "Dev", "Canary"];
+    let mut vec_channels: Vec<String> = Vec::new();
+    for name in channel_names {
+        if let Some(channel_data) = response.channels.get(name) {
+            let formatted = format!(
+                "{:<6} -> {} (v{})",
+                name.to_lowercase(),
+                name,
+                channel_data.version
+            );
+            vec_channels.push(formatted);
+        }
     }
-    vec_channels
+    Ok(vec_channels)
 }
