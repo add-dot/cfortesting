@@ -38,7 +38,8 @@ struct ApiResponseVersions {
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct GoodKnowVersions {
-    version: String, revision: String,
+    version: String,
+    revision: String,
     downloads: HashMap<String, Vec<Download>>,
 }
 
@@ -52,9 +53,7 @@ struct Downloads {
 }
 
 /// This function get all the data from the github.io of chrome to later parse
-pub async fn fetch_cft (
-    url: &str
-) -> Result<String, Box<dyn Error>> {
+pub async fn fetch_cft(url: &str) -> Result<String, Box<dyn Error>> {
     use reqwest::header;
     let mut headers = header::HeaderMap::new();
     headers.insert(
@@ -79,11 +78,18 @@ pub fn search_values_for_specifc_version(
     let mut downloable_version: Option<&Download> = None;
     let all_versions: Vec<GoodKnowVersions> = response.versions;
     let chrome_version_to_download = all_versions.iter().find(|x| x.version == browser_version);
-    if let Some(platforms) = chrome_version_to_download.unwrap().downloads.get(type_of_chrome) {
+    if let Some(platforms) = chrome_version_to_download
+        .unwrap()
+        .downloads
+        .get(type_of_chrome)
+    {
         downloable_version = platforms.iter().find(|x| x.platform == platform);
     }
     match downloable_version {
-        Some(download) => Ok((chrome_version_to_download.unwrap().version.clone(), download.url.clone())),
+        Some(download) => Ok((
+            chrome_version_to_download.unwrap().version.clone(),
+            download.url.clone(),
+        )),
         None => panic!("Error, specifc version not found in the good versions"),
     }
 }
