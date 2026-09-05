@@ -43,15 +43,6 @@ struct GoodKnowVersions {
     downloads: HashMap<String, Vec<Download>>,
 }
 
-#[allow(dead_code)]
-#[derive(Deserialize)]
-struct Downloads {
-    chrome: Vec<Download>,
-    chromedriver: Vec<Download>,
-    #[serde(rename = "chrome-headless-shell")]
-    chrome_headless_shell: Vec<Download>,
-}
-
 /// This function get all the data from the github.io of chrome to later parse
 pub async fn fetch_cft(url: &str) -> Result<String, Box<dyn Error>> {
     use reqwest::header;

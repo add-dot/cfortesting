@@ -20,7 +20,7 @@ pub async fn download_browser(
     let file_name = format!("{type_to_download}-{target_version}.zip");
     file_path.push(file_name);
     let file_path_name = file_path.to_str().unwrap().to_string();
-    let msg_progress = format!("\nSuccess");
+    let msg_progress = format!("\nSuccess, now decompressing files...");
 
     // Barra de progreso
     let pb = ProgressBar::new(content_length);
