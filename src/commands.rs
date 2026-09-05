@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name= "cfort")]
+#[command(name = "cfort")]
 #[command(version, about, long_about = None)]
 pub struct Cli {
     /// list all chanels
@@ -19,5 +19,5 @@ pub enum Commands {
         // Yes this is a direct value not a argument value
         /// this need to be like chrome@latest, chrome@1.1.1
         value: String,
-    }
+    },
 }

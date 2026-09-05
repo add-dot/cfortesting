@@ -5,16 +5,16 @@ mod commands;
 mod downloadable;
 mod extraction;
 mod parse_install;
+mod sys;
 mod tests;
-mod unixs;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     const URL_GV: &str =
         "https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json";
     const URL_LTS_GK: &str = "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json";
-    let platform = unixs::utils::get_platform();
-    let parsed_absolute = unixs::utils::create_dir().unwrap_or_else(|err| {
+    let platform = sys::utils::get_platform();
+    let parsed_absolute = sys::utils::create_dir().unwrap_or_else(|err| {
         eprintln!("Error when initilizing enviroment {err:?}");
         std::process::exit(1);
     });
@@ -50,13 +50,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            let extraction_path_str = unixs::utils::tree_directory(&parsed_absolute, type_downloable, &version_string);
-            let target_file_os = downloadable::download_browser(
-                url,
-                version_string,
-                type_downloable,
-            )
-            .await?;
+            let extraction_path_str =
+                sys::utils::tree_directory(&parsed_absolute, type_downloable, &version_string);
+            let target_file_os =
+                downloadable::download_browser(url, version_string, type_downloable).await?;
             downloadable::decompress(&target_file_os, &extraction_path_str)?;
         }
     }

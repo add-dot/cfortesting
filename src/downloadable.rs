@@ -1,11 +1,11 @@
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 use reqwest::Client;
+use std::env::temp_dir;
 use std::fs;
 use std::fs::File;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::env::temp_dir;
 
 pub async fn download_browser(
     target_browser: String,
@@ -52,7 +52,7 @@ pub async fn download_browser(
 pub fn decompress(
     target_file_os: &str,
     parsed_absolute: &str,
-) -> Result<() , Box<dyn std::error::Error>> {
+) -> Result<(), Box<dyn std::error::Error>> {
     let file = fs::File::open(target_file_os)?;
 
     println!("{parsed_absolute:?}");
@@ -60,7 +60,9 @@ pub fn decompress(
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i)?;
-        let Some(outpath) = file.enclosed_name() else { continue };
+        let Some(outpath) = file.enclosed_name() else {
+            continue;
+        };
         let mut components = outpath.components();
         components.next();
         let stripped_path: PathBuf = components.collect();

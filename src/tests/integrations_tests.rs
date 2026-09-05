@@ -314,7 +314,6 @@ fn it_extract_lts_know_version_windows() {
     assert_eq!("133.0.6943.126", version);
 }
 
-
 #[test]
 fn test_input_installation() {
     use crate::parse_install::parse_entry;
