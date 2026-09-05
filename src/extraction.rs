@@ -24,6 +24,7 @@ struct Download {
 
 // This is need for the struct to work on versions <= 115.0.5763.0 the CfT all versions >=
 // 115.0.5763.0  only have chrome on the download vector
+// NOTE: We will keep this structure to work on the future on old json with chrome versions.
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct DownloadsOld {
@@ -43,15 +44,6 @@ struct GoodKnowVersions {
     downloads: HashMap<String, Vec<Download>>,
 }
 
-#[allow(dead_code)]
-#[derive(Deserialize)]
-struct Downloads {
-    chrome: Vec<Download>,
-    chromedriver: Vec<Download>,
-    #[serde(rename = "chrome-headless-shell")]
-    chrome_headless_shell: Vec<Download>,
-}
-
 /// This function get all the data from the github.io of chrome to later parse
 pub async fn fetch_cft(url: &str) -> Result<String, Box<dyn Error>> {
     use reqwest::header;
@@ -62,13 +54,12 @@ pub async fn fetch_cft(url: &str) -> Result<String, Box<dyn Error>> {
     );
     let client = reqwest::Client::builder()
         .default_headers(headers)
-        .build()
-        .unwrap();
-    let response = client.get(url).send().await.unwrap();
+        .build()?;
+    let response = client.get(url).send().await?;
     Ok(response.text().await?)
 }
 
-pub fn search_values_for_specifc_version(
+pub fn search_values_for_specific_version(
     response: &str,
     platform: &str,
     browser_version: &str,
@@ -77,20 +68,23 @@ pub fn search_values_for_specifc_version(
     let response: ApiResponseVersions = serde_json::from_str(response)?;
     let mut downloable_version: Option<&Download> = None;
     let all_versions: Vec<GoodKnowVersions> = response.versions;
-    let chrome_version_to_download = all_versions.iter().find(|x| x.version == browser_version);
-    if let Some(platforms) = chrome_version_to_download
-        .unwrap()
-        .downloads
-        .get(type_of_chrome)
-    {
+    let chrome_version_to_download = all_versions
+        .iter()
+        .find(|x| x.version == browser_version)
+        .ok_or_else(|| {
+            format!("Error: Version {browser_version} not found in the know good versions")
+        })?;
+    if let Some(platforms) = chrome_version_to_download.downloads.get(type_of_chrome) {
         downloable_version = platforms.iter().find(|x| x.platform == platform);
     }
-    match downloable_version {
-        Some(download) => Ok((
-            chrome_version_to_download.unwrap().version.clone(),
+    if let Some(download) = downloable_version {
+        Ok((
+            chrome_version_to_download.version.clone(),
             download.url.clone(),
-        )),
-        None => panic!("Error, specifc version not found in the good versions"),
+        ))
+    } else {
+        let err_msg = format!("Error: Download not found for platform {platform} and type {type_of_chrome} in version {browser_version}");
+        Err(err_msg.into())
     }
 }
 
@@ -111,22 +105,29 @@ pub fn search_values_for_lts_know(
             download_version = platforms.iter().find(|x| x.platform == platform);
         }
     }
-    match download_version {
-        Some(download) => Ok((channels_version, download.url.clone())),
-        None => panic!("Error the version provides LTS is not good know version"),
+    if let Some(download) = download_version {
+        Ok((channels_version, download.url.clone()))
+    } else {
+        let err_msg = format!("Error: Download not found for platform {platform} and type {type_of_chrome} in channel {browser_version}");
+        Err(err_msg.into())
     }
 }
 
-pub fn list_channels() -> Vec<String> {
-    let channels: HashMap<&str, &str> = HashMap::from([
-        ("stable", "Stable"),
-        ("beta", "Beta"),
-        ("dev", "Dev"),
-        ("canary", "Canary"),
-    ]);
-    let mut vec_channels: Vec<String> = vec![];
-    for value in channels.values() {
-        vec_channels.push((*value).to_string());
+pub async fn list_channels(url: &str) -> Result<Vec<String>, Box<dyn Error>> {
+    let response_text = fetch_cft(url).await?;
+    let response: ApiResponseLtsKnow = serde_json::from_str(&response_text)?;
+    let channel_names = ["Stable", "Beta", "Dev", "Canary"];
+    let mut vec_channels: Vec<String> = Vec::new();
+    for name in channel_names {
+        if let Some(channel_data) = response.channels.get(name) {
+            let formatted = format!(
+                "{:<6} -> {} (v{})",
+                name.to_lowercase(),
+                name,
+                channel_data.version
+            );
+            vec_channels.push(formatted);
+        }
     }
-    vec_channels
+    Ok(vec_channels)
 }

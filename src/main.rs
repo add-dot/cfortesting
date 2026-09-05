@@ -1,5 +1,4 @@
 use clap::Parser;
-use extraction::list_channels;
 use parse_install::parse_entry;
 mod commands;
 mod downloadable;
@@ -21,8 +20,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = commands::Cli::parse();
     match cli.command {
         commands::Commands::ListChannels => {
-            let listed_channels = list_channels();
-            println!("{listed_channels:?}");
+            match extraction::list_channels(URL_LTS_GK).await {
+                Ok(listed_channels) => {
+                    println!("Available channels and their current versions:");
+                    for channel in listed_channels {
+                        println!("  {channel}");
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Failed to fetch channel information: {e}");
+                    std::process::exit(1);
+                }
+            };
         }
         commands::Commands::Install { value } => {
             let (type_downloable, version) = parse_entry(&value).unwrap_or_else(|err| {
@@ -41,7 +50,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 _ => {
                     let response = extraction::fetch_cft(URL_GV).await?;
-                    extraction::search_values_for_specifc_version(
+                    extraction::search_values_for_specific_version(
                         &response,
                         platform,
                         version,
