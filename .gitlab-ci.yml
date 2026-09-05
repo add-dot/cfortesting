@@ -4,8 +4,6 @@ stages:
   - test
   - validate
 
-.setup_deps: &setup_deps
-  - apk add --no-cache pkgconfig openssl-dev musl-dev gcc make perl
 cache: &global_cache
   key: ${CI_COMMIT_REF_SLUG}
   paths:
@@ -18,15 +16,11 @@ variables:
 
 validate-syntax-errors:
   stage: test
-  before_script:
-    - *setup_deps
   script:
     - cargo check --workspace --all-features
 
 validate_tests:
   stage: validate
-  before_script:
-    - *setup_deps
   script:
     - cargo test --workspace --all-features
   cache:
@@ -36,7 +30,6 @@ validate_tests:
 validate-format-check-and-lint:
   stage: validate
   before_script:
-    - *setup_deps
     - rustup component add clippy rustfmt
   script:
     - cargo clippy --workspace --all-features --all-targets -- -D warnings
