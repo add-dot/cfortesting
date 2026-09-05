@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.com/var0g/cft/master/pipeline.svg)](https://gitlab.com/var0g/cft/-/commits/master
+[![pipeline status](https://gitlab.com/var0G/cft/badges/master/pipeline.svg)](https://gitlab.com/var0G/cft/-/commits/master)
 ## cftesting
 A command-line interface tool written in Rust to easily download Chrome for testing,
 Chromedriver, Chrome Headless Shell binaries.
