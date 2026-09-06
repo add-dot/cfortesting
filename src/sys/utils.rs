@@ -1,4 +1,5 @@
 use dirs::home_dir;
+use std::env::consts::{ARCH, OS};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -18,13 +19,13 @@ pub fn create_dir() -> Result<PathBuf, Error> {
 }
 
 pub fn get_platform() -> &'static str {
-    match () {
-        () if cfg!(target_os = "linux") => "linux64",
-        () if cfg!(all(target_os = "macos", target_arch = "aarch64")) => "mac-arm64",
-        () if cfg!(all(target_os = "macos", target_arch = "x86_64")) => "mac-x64",
-        () if cfg!(all(target_os = "windows", target_pointer_width = "32")) => "win32",
-        () if cfg!(all(target_os = "windows", target_pointer_width = "64")) => "win64",
-        () => "unknown",
+    match (OS, ARCH) {
+        ("linux", _) => "linux64",
+        ("macos", "aarch64") => "mac-arm64",
+        ("macos", "x86_64") => "mac-x64",
+        ("windows", "x86") => "win32",
+        ("windows", "x86_64") => "win64",
+        _ => "unkown",
     }
 }
 
