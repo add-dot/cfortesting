@@ -83,8 +83,9 @@ pub fn decompress(
                     fs::create_dir_all(p)?;
                 }
             }
-            let mut outfile = fs::File::create(&final_outpath)?;
-            io::copy(&mut file, &mut outfile)?;
+            let outfile = fs::File::create(&final_outpath)?;
+            let mut writer = std::io::BufWriter::new(outfile);
+            io::copy(&mut file, &mut writer)?;
         }
 
         // Get and Set permissions

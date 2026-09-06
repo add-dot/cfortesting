@@ -49,7 +49,7 @@ pub fn tree_directory(
 }
 
 pub fn is_already_isntalled(extraction_path: &Path, type_downloable: &str) -> bool {
-    if !extraction_path.exists()  {
+    if !extraction_path.exists() {
         return false;
     }
     let binary_name = match (OS, type_downloable) {
@@ -57,7 +57,7 @@ pub fn is_already_isntalled(extraction_path: &Path, type_downloable: &str) -> bo
         ("windows", "chromedriver") => "chromedirver.exe",
         ("windows", "chrome-headless-shell") => "chrome-headless-shell.exe",
         (_, "chrome") => "chrome",
-        (_,"chromedriver") => "chromedirver",
+        (_, "chromedriver") => "chromedirver",
         (_, "chrome-headless-shell") => "chrome-headless-shell",
         _ => return true,
     };
