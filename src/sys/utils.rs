@@ -47,3 +47,20 @@ pub fn tree_directory(
 ) -> PathBuf {
     parsed_absoluted.join(type_downloable).join(version_string)
 }
+
+pub fn is_already_isntalled(extraction_path: &Path, type_downloable: &str) -> bool {
+    if !extraction_path.exists()  {
+        return false;
+    }
+    let binary_name = match (OS, type_downloable) {
+        ("windows", "chrome") => "chrome.exe",
+        ("windows", "chromedriver") => "chromedirver.exe",
+        ("windows", "chrome-headless-shell") => "chrome-headless-shell.exe",
+        (_, "chrome") => "chrome",
+        (_,"chromedriver") => "chromedirver",
+        (_, "chrome-headless-shell") => "chrome-headless-shell",
+        _ => return true,
+    };
+    let binary_path = extraction_path.join(binary_name);
+    binary_path.exists()
+}

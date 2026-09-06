@@ -97,6 +97,8 @@ pub fn decompress(
             }
         }
     }
+    let marker_path = parsed_absolute.join(".cft_success");
+    fs::File::create(&marker_path)?;
     println!("Completed successfully to: {}", parsed_absolute.display());
     Ok(())
 }
