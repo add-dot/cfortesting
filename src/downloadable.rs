@@ -57,7 +57,7 @@ impl Drop for FileCleanup<'_> {
 
 pub fn decompress(
     target_file_os: &Path,
-    parsed_absolute: &str,
+    parsed_absolute: &Path,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let _cleanup = FileCleanup(target_file_os);
     let file = fs::File::open(target_file_os)?;
@@ -74,7 +74,7 @@ pub fn decompress(
         if stripped_path.as_os_str().is_empty() {
             continue;
         }
-        let final_outpath = Path::new(&parsed_absolute).join(stripped_path);
+        let final_outpath = parsed_absolute.join(stripped_path);
         if file.is_dir() {
             fs::create_dir_all(&final_outpath)?;
         } else {
@@ -97,6 +97,6 @@ pub fn decompress(
             }
         }
     }
-    println!("Completed successfully to: {parsed_absolute}");
+    println!("Completed successfully to: {}", parsed_absolute.display());
     Ok(())
 }
