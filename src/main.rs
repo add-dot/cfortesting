@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         commands::Commands::ListChannels => {
             match extraction::list_channels(URL_LTS_GK).await {
                 Ok(listed_channels) => {
-                    println!("Available channels and their current versions:");
+                    println!("Available channels and their current versions on last know good verisions:");
                     for channel in listed_channels {
                         println!("  {channel}");
                     }
@@ -59,11 +59,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
 
-            let extraction_path_str =
+            let extraction_path =
                 sys::utils::tree_directory(&parsed_absolute, type_downloable, &version_string);
             let target_file_os =
                 downloadable::download_browser(url, version_string, type_downloable).await?;
-            downloadable::decompress(&target_file_os, &extraction_path_str)?;
+            downloadable::decompress(&target_file_os, &extraction_path)?;
         }
     }
     Ok(())
