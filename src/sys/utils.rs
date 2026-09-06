@@ -1,14 +1,25 @@
 use dirs::home_dir;
 use std::env::consts::{ARCH, OS};
-use std::fs;
 use std::path::{Path, PathBuf};
+use std::{fmt, fs};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Error {
     CannotCreateDir,
     HomeDirNotFound,
 }
-
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::CannotCreateDir => {
+                write!(f, "The required '.cft' directory cannot be created")
+            }
+            Error::HomeDirNotFound => {
+                write!(f, "The User Home Directory is not Found")
+            }
+        }
+    }
+}
 pub fn create_dir() -> Result<PathBuf, Error> {
     let home: std::path::PathBuf = home_dir().ok_or(Error::HomeDirNotFound)?;
     let target_dir = home.join(".cft");

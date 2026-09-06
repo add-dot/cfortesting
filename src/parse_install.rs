@@ -1,9 +1,27 @@
+use std::error::Error as StdError;
+use std::fmt;
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum Error {
     InvalidEntryFormat,
     InvalidName,
     EmptyValue,
 }
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::InvalidEntryFormat => {
+                write!(f, "Invalid entry format, expected format: name@version")
+            }
+            Error::InvalidName => write!(
+                f,
+                "Invalid name, must be chrome, chromedriver, chrome-headless-shell"
+            ),
+            Error::EmptyValue => write!(f, "The provided entry value is empty"),
+        }
+    }
+}
+impl StdError for Error {}
 
 /// entry: &str input of the user on the cli this functions parse the entry argument of the user
 /// and make it valid to the other functions so it make it easy to use.
