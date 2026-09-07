@@ -61,6 +61,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             let extraction_path =
                 sys::utils::tree_directory(&parsed_absolute, type_downloable, &version_string);
+            if sys::utils::is_already_isntalled(&extraction_path, type_downloable) {
+                println!(
+                    "{} version {} is alredy installed at\n {}",
+                    type_downloable,
+                    version_string,
+                    extraction_path.display()
+                );
+                return Ok(());
+            }
             let target_file_os =
                 downloadable::download_browser(url, version_string, type_downloable).await?;
             downloadable::decompress(&target_file_os, &extraction_path)?;
