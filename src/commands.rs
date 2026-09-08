@@ -20,4 +20,11 @@ pub enum Commands {
         /// this need to be like chrome@latest, chrome@1.1.1
         value: String,
     },
+    /// Remove and delete previous installations
+    Purge {
+        #[arg(conflicts_with = "all")]
+        value: Option<String>,
+        #[arg(long, short, conflicts_with = "value")]
+        all: bool,
+    },
 }
