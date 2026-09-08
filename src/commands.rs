@@ -22,8 +22,11 @@ pub enum Commands {
     },
     /// Remove and delete previous installations
     Purge {
+        /// For specific values use <resource>@<version>
+        /// Ex: chrome@1.1.1.1
         #[arg(conflicts_with = "all")]
         value: Option<String>,
+        /// Remove all installed resources
         #[arg(long, short, conflicts_with = "value")]
         all: bool,
     },
