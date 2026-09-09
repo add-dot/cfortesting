@@ -5,6 +5,7 @@ use crate::remove::purge_specific_version;
 mod commands;
 mod downloadable;
 mod extraction;
+mod list;
 mod parse_install;
 mod remove;
 mod sys;
@@ -35,6 +36,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     std::process::exit(1);
                 }
             };
+        }
+        commands::Commands::ListInstalled => {
+            list::list_installed(&parsed_absolute);
         }
         commands::Commands::Purge { value, all } => match (all, value) {
             (true, _) => {
