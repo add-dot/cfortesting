@@ -11,7 +11,7 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// List channels of chrome, chromevdriver, chrome-headless-shell
+    /// List Latest know good channels of chrome, chromevdriver, chrome-headless-shell
     ListChannels,
     /// List local installed resources.
     ListInstalled,
