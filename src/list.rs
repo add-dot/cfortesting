@@ -1,17 +1,15 @@
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
-pub fn list_installed(parsed_absolute: &Path) {
-    if !parsed_absolute.exists() {
-        println!("No installations found.");
-        return;
-    }
+pub fn list_installed(parsed_absolute: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    let mut installations = BTreeMap::new();
 
-    let mut found_any = false;
-
-    if let Ok(entries) = fs::read_dir(parsed_absolute) {
-        for entry in entries.flatten() {
+    if parsed_absolute.exists() {
+        for entry in fs::read_dir(parsed_absolute)? {
+            let entry = entry?;
             let path = entry.path();
+
             if path.is_dir() {
                 let type_name = entry.file_name().to_string_lossy().into_owned();
                 let mut versions = Vec::new();
@@ -24,17 +22,24 @@ pub fn list_installed(parsed_absolute: &Path) {
                     }
                 }
                 if !versions.is_empty() {
-                    found_any = true;
-                    println!("{type_name}:");
-                    for version in versions {
-                        println!("  - {version}");
-                    }
+                    versions.sort();
+                    installations.insert(type_name, versions);
                 }
             }
         }
     }
-    if !found_any {
+
+    if installations.is_empty() {
         println!("No installations found.");
         println!("Try running: cftesting list-channels and cftesting install <resource>@version to begin");
+    } else {
+        for (type_name, versions) in installations {
+            println!("{type_name}:");
+            for version in versions {
+                println!("  - {version}");
+            }
+        }
     }
+
+    Ok(())
 }

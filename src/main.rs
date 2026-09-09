@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
         }
         commands::Commands::ListInstalled => {
-            list::list_installed(&parsed_absolute);
+            list::list_installed(&parsed_absolute)?;
         }
         commands::Commands::Purge { value, all } => match (all, value) {
             (true, _) => {
