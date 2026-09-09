@@ -1,9 +1,12 @@
 use clap::Parser;
 use parse_install::parse_entry;
+
+use crate::remove::purge_specific_version;
 mod commands;
 mod downloadable;
 mod extraction;
 mod parse_install;
+mod remove;
 mod sys;
 mod tests;
 
@@ -33,6 +36,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             };
         }
+        commands::Commands::Purge { value, all } => match (all, value) {
+            (true, _) => {
+                remove::purge_all(&parsed_absolute);
+            }
+            (false, Some(val)) => {
+                purge_specific_version(&val, &parsed_absolute, platform, URL_LTS_GK).await?;
+            }
+            (false, None) => {
+                eprintln!("Please provide a specific version to purge or use the --all flag.");
+                std::process::exit(1);
+            }
+        },
         commands::Commands::Install { value } => {
             let (type_downloable, version) = parse_entry(&value).unwrap_or_else(|err| {
                 eprintln!("Error parsing entry value: {err:?}");
