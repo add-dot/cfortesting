@@ -17,10 +17,7 @@ pub async fn purge_specific_version(
     platform: &str,
     url: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let (type_downloable, version) = parse_entry(val).unwrap_or_else(|err| {
-        eprintln!("Error parsing entry value: {err:?}");
-        std::process::exit(1);
-    });
+    let (type_downloable, version) = parse_entry(val)?;
 
     let version_string = match version {
         "Stable" | "Beta" | "Dev" | "Canary" => {
