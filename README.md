@@ -29,9 +29,26 @@ Install a specific version of ChromeDriver:
 cfortesting install chromedriver@116.0.5845.96
 ```
 Install the Canary channel of Chrome Headless Shell:
-```
+```bash
 cfortesting install chrome-headless-shell@canary
 ```
+List available channels:
+```bash
+cfortesting list-channels
+```
+List installed binaries:
+```bash
+cfortesting list-installed
+```
+Remove a specific version:
+```bash
+cfortesting purge chrome@stable
+```
+Remove all downloaded binaries:
+```bash
+cfortesting purge --all
+```
+
 
 #### Where are the binaries stored?
 All downloaded and extracted binaries are stored in your home directory under the .cft hidden folder, structured by binary type and version.

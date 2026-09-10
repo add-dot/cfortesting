@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "cfort")]
+#[command(name = "cfortesting")]
 #[command(version, about, long_about = None)]
 pub struct Cli {
     /// list all chanels
