@@ -40,6 +40,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         commands::Commands::ListInstalled => {
             list::list_installed(&parsed_absolute)?;
         }
+        commands::Commands::List => {
+            match extraction::list_all_versions(URL_GV).await {
+                Ok(versions) => {
+                    println!("Available known good versions:");
+                    for version in &versions {
+                        println!("  {version}");
+                    }
+                    println!("Total versions found: {}", versions.len());
+                }
+                Err(e) => {
+                    eprintln!("Failed to fetch versions: {e}");
+                    std::process::exit(1);
+                }
+            };
+        }
         commands::Commands::Purge { value, all } => match (all, value) {
             (true, _) => {
                 remove::purge_all(&parsed_absolute);

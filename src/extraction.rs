@@ -131,3 +131,14 @@ pub async fn list_channels(url: &str) -> Result<Vec<String>, Box<dyn Error>> {
     }
     Ok(vec_channels)
 }
+
+pub async fn list_all_versions(url: &str) -> Result<Vec<String>, Box<dyn Error>> {
+    let response_text = fetch_cft(url).await?;
+    let response: ApiResponseVersions = serde_json::from_str(&response_text)?;
+    let versions: Vec<String> = response.versions
+        .into_iter()
+        .map(|v| v.version)
+        .collect();
+        
+    Ok(versions)
+}
