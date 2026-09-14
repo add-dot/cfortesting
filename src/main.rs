@@ -1,7 +1,6 @@
 use clap::Parser;
 use parse_install::parse_entry;
 
-use crate::remove::purge_specific_version;
 mod commands;
 mod downloadable;
 mod extraction;
@@ -80,7 +79,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 remove::purge_all(&parsed_absolute);
             }
             (false, Some(val)) => {
-                purge_specific_version(&val, &parsed_absolute, platform, URL_LTS_GK).await?;
+                remove::purge_specific_version(&val, &parsed_absolute, platform, URL_LTS_GK).await?;
             }
             (false, None) => {
                 eprintln!("Please provide a specific version to purge or use the --all flag.");
