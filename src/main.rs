@@ -1,7 +1,6 @@
 use clap::Parser;
 use parse_install::parse_entry;
 
-use crate::remove::purge_specific_version;
 mod commands;
 mod downloadable;
 mod extraction;
@@ -40,14 +39,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         commands::Commands::ListInstalled => {
             list::list_installed(&parsed_absolute)?;
         }
-        commands::Commands::List => {
+        commands::Commands::List { limit, prefix } => {
             match extraction::list_all_versions(URL_GV).await {
                 Ok(versions) => {
+                    let filtered_version: Vec<String> = match &prefix {
+                        Some(p) => versions.into_iter().filter(|v| v.starts_with(p)).collect(),
+                        None => versions,
+                    };
+                    let total_found = filtered_version.len();
+                    let display_versions: Vec<String> = if total_found > limit {
+                        filtered_version
+                            .into_iter()
+                            .skip(total_found - limit)
+                            .collect()
+                    } else {
+                        filtered_version
+                    };
                     println!("Available known good versions:");
-                    for version in &versions {
+                    for version in &display_versions {
                         println!("  {version}");
                     }
-                    println!("Total versions found: {}", versions.len());
+                    if total_found > limit {
+                        println!("... (showing last {limit} out of {total_found} versions found)");
+                        println!(
+                            "Tip: Use --limit <NUM> to see more, or --prefix <VERSION> to filter."
+                        );
+                    } else {
+                        println!("Total versions found: {total_found}");
+                    }
                 }
                 Err(e) => {
                     eprintln!("Failed to fetch versions: {e}");
@@ -60,7 +79,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 remove::purge_all(&parsed_absolute);
             }
             (false, Some(val)) => {
-                purge_specific_version(&val, &parsed_absolute, platform, URL_LTS_GK).await?;
+                remove::purge_specific_version(&val, &parsed_absolute, platform, URL_LTS_GK)
+                    .await?;
             }
             (false, None) => {
                 eprintln!("Please provide a specific version to purge or use the --all flag.");
