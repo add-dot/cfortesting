@@ -79,7 +79,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 remove::purge_all(&parsed_absolute);
             }
             (false, Some(val)) => {
-                remove::purge_specific_version(&val, &parsed_absolute, platform, URL_LTS_GK).await?;
+                remove::purge_specific_version(&val, &parsed_absolute, platform, URL_LTS_GK)
+                    .await?;
             }
             (false, None) => {
                 eprintln!("Please provide a specific version to purge or use the --all flag.");
