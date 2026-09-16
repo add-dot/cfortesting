@@ -16,7 +16,12 @@ pub enum Commands {
     /// List local installed resources.
     ListInstalled,
     /// List all Good Know Versions
-    List,
+    List {
+        #[arg(short, long, default_value_t = 10)]
+        limit: usize,
+        #[arg(short, long)]
+        prefix: Option<String>,
+    },
     /// Select the Channels to download the chrome.
     Install {
         //#[arg(short, long)]
